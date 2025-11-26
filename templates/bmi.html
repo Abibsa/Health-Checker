@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}Hitung BMI — Health Checker{% endblock %}
+
+{% block content %}
+<style>
+  .severity-bg-low { background: #1a3a2a; }
+  .severity-bg-moderate { background: #3a2a1a; }
+  .severity-bg-high { background: #3a1a1a; }
+  .severity-border-low { border-left-color: #28a745; }
+  .severity-border-moderate { border-left-color: #ffc107; }
+  .severity-border-high { border-left-color: #dc3545; }
+</style>
+  <div class="container">
+    <header>
+      <p class="badge emergency">Kalkulator BMI</p>
+      <h1>Hitung Berat Badan Ideal</h1>
+      <p class="lead">Masukkan berat dan tinggi badan untuk menghitung Indeks Massa Tubuh (BMI) dan mengetahui kategori berat badan Anda.</p>
+    </header>
+
+    <form class="card" method="post" action="/bmi">
+      <div class="card card-nested">
+        <legend>Profil Anda</legend>
+        <div class="form-grid">
+          <label class="input-field">
+            <span>Nama (opsional)</span>
+            <input type="text" name="name" value="{{ defaults.name }}" placeholder="masukkan nama Anda">
+          </label>
+          <label class="input-field">
+            <span>Berat</span>
+            <input type="number" step="0.1" name="weight" value="{{ defaults.weight }}" placeholder="contoh: 70" required>
+          </label>
+          <label class="input-field">
+            <span>Tinggi</span>
+            <input type="number" step="0.1" name="height" value="{{ defaults.height }}" placeholder="contoh: 175" required>
+          </label>
+        </div>
+        <div class="unit-toggle">
+          <label>
+            <input type="radio" name="units" value="metric" {% if defaults.units == 'metric' %}checked{% endif %}>
+            Metric (kg / cm)
+          </label>
+          <label>
+            <input type="radio" name="units" value="imperial" {% if defaults.units == 'imperial' %}checked{% endif %}>
+            Imperial (lbs / inches)
+          </label>
+        </div>
+      </div>
+
+      <button type="submit">Hitung BMI</button>
+    </form>
+
+    {% if error %}
+    <div class="card">
+      <p class="error">{{ error }}</p>
+    </div>
+    {% endif %}
+
+    {% if result %}
+    <div class="card">
+      <p class="badge">Hasil Perhitungan</p>
+      {% if result.name %}
+      <h2>{{ result.name }}</h2>
+      {% endif %}
+      
+      <div style="margin: 1.5rem 0;">
+        <div style="display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap;">
+          <h2 style="margin: 0;">BMI: <strong style="font-size: 2rem; color: var(--accent);">{{ result.bmi }}</strong></h2>
+          <span class="badge {% if result.category_details.severity == 'low' %}priority-low{% elif result.category_details.severity == 'moderate' %}priority-medium{% else %}emergency{% endif %}" style="font-size: 1rem;">
+            {{ result.bmi_category }}
+          </span>
+        </div>
+        <p style="margin-top: 0.5rem; color: var(--muted);">{{ result.category_details.description }}</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+        <div class="card card-nested" style="padding: 1rem;">
+          <strong style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.9rem;">Berat Badan</strong>
+          <div style="font-size: 1.5rem; font-weight: bold;">{{ result.weight_kg }} kg</div>
+          <div style="font-size: 0.85rem; color: var(--muted); margin-top: 0.25rem;">
+            ({{ result.weight }} {{ 'kg' if result.units == 'metric' else 'lbs' }})
+          </div>
+        </div>
+        <div class="card card-nested" style="padding: 1rem;">
+          <strong style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.9rem;">Tinggi Badan</strong>
+          <div style="font-size: 1.5rem; font-weight: bold;">{{ result.height_cm }} cm</div>
+          <div style="font-size: 0.85rem; color: var(--muted); margin-top: 0.25rem;">
+            ({{ result.height }} {{ 'cm' if result.units == 'metric' else 'in' }})
+          </div>
+        </div>
+        <div class="card card-nested" style="padding: 1rem;">
+          <strong style="display: block; margin-bottom: 0.5rem; color: var(--muted); font-size: 0.9rem;">BMR (Estimasi)</strong>
+          <div style="font-size: 1.5rem; font-weight: bold;">{{ result.bmr }} kkal</div>
+          <div style="font-size: 0.85rem; color: var(--muted); margin-top: 0.25rem;">
+            Kalori/hari (istirahat)
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-nested" style="margin-top: 1rem; padding: 1.25rem; background: var(--card-soft);">
+        <h3 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.1rem;">Rentang Berat Badan Ideal</h3>
+        <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 200px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <span style="color: var(--muted);">Minimum (BMI 18.5):</span>
+              <strong>{{ result.ideal_weight_min }} kg</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--muted);">Maksimum (BMI 24.9):</span>
+              <strong>{{ result.ideal_weight_max }} kg</strong>
+            </div>
+          </div>
+          {% if result.weight_difference.type == 'gain' %}
+          <div style="padding: 0.75rem 1rem; background: rgba(255, 193, 7, 0.15); border-left: 4px solid #ffc107; border-radius: 4px; flex: 1; min-width: 200px;">
+            <strong style="display: block; margin-bottom: 0.25rem; color: #ffc107;">Perlu Menambah Berat</strong>
+            <div style="font-size: 0.9rem; color: var(--muted);">
+              Target: <strong style="color: var(--text);">{{ result.weight_difference.target }} kg</strong> 
+              (tambah {{ result.weight_difference.amount }} kg)
+            </div>
+          </div>
+          {% elif result.weight_difference.type == 'lose' %}
+          <div style="padding: 0.75rem 1rem; background: rgba(23, 162, 184, 0.15); border-left: 4px solid #17a2b8; border-radius: 4px; flex: 1; min-width: 200px;">
+            <strong style="display: block; margin-bottom: 0.25rem; color: #17a2b8;">Perlu Menurunkan Berat</strong>
+            <div style="font-size: 0.9rem; color: var(--muted);">
+              Target: <strong style="color: var(--text);">{{ result.weight_difference.target }} kg</strong> 
+              (turunkan {{ result.weight_difference.amount }} kg)
+            </div>
+          </div>
+          {% else %}
+          <div style="padding: 0.75rem 1rem; background: rgba(40, 167, 69, 0.15); border-left: 4px solid #28a745; border-radius: 4px; flex: 1; min-width: 200px;">
+            <strong style="display: block; margin-bottom: 0.25rem; color: #28a745;">Berat Badan Ideal</strong>
+            <div style="font-size: 0.9rem; color: var(--muted);">
+              Berat badan Anda sudah dalam rentang ideal!
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card card-nested" style="margin-top: 1rem; padding: 1.25rem; background: var(--card-soft);">
+        <h3 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.1rem;">Detail Perhitungan</h3>
+        <div style="font-family: 'Courier New', monospace; background: var(--card); padding: 1rem; border-radius: 4px; margin-bottom: 0.75rem;">
+          <div style="margin-bottom: 0.5rem;">
+            <strong>Rumus BMI:</strong> BMI = Berat (kg) / (Tinggi (m))²
+          </div>
+          <div style="margin-bottom: 0.5rem;">
+            <strong>Perhitungan:</strong> {{ result.weight_kg }} kg / ({{ result.height_m }} m)²
+          </div>
+          <div>
+            <strong>Hasil:</strong> {{ result.weight_kg }} / {{ "%.4f"|format(result.height_m * result.height_m) }} = <strong>{{ result.bmi }}</strong>
+          </div>
+        </div>
+        <div style="font-size: 0.9rem; color: var(--muted);">
+          <strong>Catatan:</strong> BMI (Body Mass Index) adalah indikator sederhana untuk mengukur komposisi tubuh berdasarkan berat dan tinggi badan. 
+          Meskipun berguna sebagai panduan umum, BMI tidak memperhitungkan massa otot, distribusi lemak, atau faktor genetik.
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if result %}
+    <div class="card">
+      <p class="badge">Penjelasan BMI & Kesehatan</p>
+      
+      <div style="margin-bottom: 2rem;">
+        <h3 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.2rem;">Kategori BMI Anda: {{ result.bmi_category }}</h3>
+        <p style="font-size: 1.05rem; line-height: 1.6; margin-bottom: 1rem;">
+          {{ result.category_details.description }}. BMI Anda sebesar <strong>{{ result.bmi }}</strong> menunjukkan bahwa 
+          {% if result.bmi_category == 'Underweight' %}
+          berat badan Anda berada di bawah rentang normal yang direkomendasikan.
+          {% elif result.bmi_category == 'Normal' %}
+          berat badan Anda berada dalam rentang normal yang sehat.
+          {% elif result.bmi_category == 'Overweight' %}
+          berat badan Anda melebihi rentang normal yang direkomendasikan.
+          {% else %}
+          berat badan Anda berada dalam kategori obesitas yang memerlukan perhatian medis.
+          {% endif %}
+        </p>
+      </div>
+
+      {% if result.category_details.severity == 'low' %}
+        {% set bg_class = 'severity-bg-low' %}
+        {% set border_class = 'severity-border-low' %}
+      {% elif result.category_details.severity == 'moderate' %}
+        {% set bg_class = 'severity-bg-moderate' %}
+        {% set border_class = 'severity-border-moderate' %}
+      {% else %}
+        {% set bg_class = 'severity-bg-high' %}
+        {% set border_class = 'severity-border-high' %}
+      {% endif %}
+      <div class="card card-nested {{ bg_class }} {{ border_class }}" style="margin-bottom: 1.5rem; padding: 1.25rem; border-left: 4px solid;">
+        <h3 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.1rem;">
+          Risiko Kesehatan yang Terkait
+        </h3>
+        <ul style="margin: 0; padding-left: 1.5rem;">
+          {% for risk in result.category_details.health_risks %}
+          <li style="margin-bottom: 0.5rem; line-height: 1.5;">{{ risk }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="card card-nested" style="margin-bottom: 1.5rem; padding: 1.25rem; background: var(--card-soft);">
+        <h3 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.1rem;">
+          Rekomendasi & Langkah Tindakan
+        </h3>
+        <ol style="margin: 0; padding-left: 1.5rem;">
+          {% for rec in result.category_details.recommendations %}
+          <li style="margin-bottom: 0.75rem; line-height: 1.6;">{{ rec }}</li>
+          {% endfor %}
+        </ol>
+      </div>
+
+      <div style="border-top: 2px solid rgba(255, 255, 255, 0.08); padding-top: 1.5rem; margin-top: 2rem;">
+        <h3 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.1rem;">Klasifikasi BMI Menurut WHO</h3>
+        <div style="display: grid; gap: 0.75rem;">
+          {% set is_underweight = result.bmi_raw < 18.5 %}
+          {% set is_normal = result.bmi_raw >= 18.5 and result.bmi_raw < 25.0 %}
+          {% set is_overweight = result.bmi_raw >= 25.0 and result.bmi_raw < 30.0 %}
+          {% set is_obese = result.bmi_raw >= 30.0 %}
+          
+          <div class="bmi-class-row {% if is_underweight %}bmi-class-active{% endif %}" style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; border-radius: 4px;">
+            <div style="flex: 0 0 120px;"><strong>&lt; 18.5</strong></div>
+            <div style="flex: 0 0 150px;"><strong>Underweight</strong></div>
+            <div style="flex: 1; color: var(--muted);">Berat badan di bawah normal, perlu evaluasi gizi dan pola makan</div>
+          </div>
+          <div class="bmi-class-row {% if is_normal %}bmi-class-active{% endif %}" style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; border-radius: 4px;">
+            <div style="flex: 0 0 120px;"><strong>18.5 - 24.9</strong></div>
+            <div style="flex: 0 0 150px;"><strong>Normal</strong></div>
+            <div style="flex: 1; color: var(--muted);">Berat badan ideal, pertahankan dengan pola hidup sehat</div>
+          </div>
+          <div class="bmi-class-row {% if is_overweight %}bmi-class-active{% endif %}" style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; border-radius: 4px;">
+            <div style="flex: 0 0 120px;"><strong>25.0 - 29.9</strong></div>
+            <div style="flex: 0 0 150px;"><strong>Overweight</strong></div>
+            <div style="flex: 1; color: var(--muted);">Kelebihan berat badan, evaluasi aktivitas fisik dan pola makan</div>
+          </div>
+          <div class="bmi-class-row {% if is_obese %}bmi-class-active{% endif %}" style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; border-radius: 4px;">
+            <div style="flex: 0 0 120px;"><strong>≥ 30.0</strong></div>
+            <div style="flex: 0 0 150px;"><strong>Obesity</strong></div>
+            <div style="flex: 1; color: var(--muted);">Obesitas, konsultasi dengan tenaga kesehatan untuk rencana penurunan berat badan</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 2rem; padding: 1rem; background: rgba(0, 102, 204, 0.15); border-left: 4px solid #0066cc; border-radius: 4px;">
+        <p style="margin: 0; line-height: 1.6; color: var(--text);">
+          <strong style="color: #4da6ff;">⚠️ Peringatan Penting:</strong> BMI adalah alat skrining yang berguna, namun memiliki keterbatasan. 
+          BMI tidak membedakan antara massa otot dan lemak, sehingga atlet dengan massa otot tinggi mungkin memiliki BMI tinggi 
+          meskipun tidak memiliki lemak berlebih. Sebaliknya, orang tua dengan massa otot rendah mungkin memiliki BMI normal 
+          meskipun memiliki lemak berlebih. Selalu konsultasikan dengan dokter atau ahli gizi untuk evaluasi kesehatan yang lebih komprehensif.
+        </p>
+      </div>
+    </div>
+    {% endif %}
+
+    <a class="nav-link" href="/">← Kembali ke Beranda</a>
+  </div>
+{% endblock %}
+

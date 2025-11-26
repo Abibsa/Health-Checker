@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 200" preserveAspectRatio="xMidYMax meet">
+  <defs>
+    <linearGradient id="femaleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6699;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#FF3399;stop-opacity:0.9" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Smooth female silhouette - standing pose -->
+  <path d="M 37.5 8
+           C 35 8, 32 10, 32 14
+           C 32 18, 34 20, 36 22
+           C 37.5 24, 38.5 24, 40 22
+           C 42 20, 43 18, 43 14
+           C 43 10, 41 8, 39.5 8
+           Z
+           M 36.5 24
+           L 36.5 38
+           L 38.5 38
+           L 38.5 24
+           Z
+           M 28 40
+           C 25 42, 23 45, 22 48
+           C 21 52, 21 55, 22 58
+           C 21 60, 21 63, 20 65
+           C 19 68, 18 72, 18 78
+           L 18 125
+           C 18 128, 20 130, 23 131
+           C 25 132, 27 134, 28 135
+           L 28 170
+           C 28 175, 30 178, 33 180
+           C 30 182, 28 185, 28 190
+           L 28 195
+           C 28 198, 30 200, 33 200
+           L 37.5 200
+           L 42 200
+           C 45 200, 47 198, 47 195
+           L 47 190
+           C 47 185, 45 182, 42 180
+           C 45 178, 47 175, 47 170
+           L 47 135
+           C 49 134, 51 132, 54 131
+           C 57 130, 59 128, 59 125
+           L 59 78
+           C 59 72, 58 68, 57 65
+           C 57 63, 57 60, 58 58
+           C 59 55, 59 52, 58 48
+           C 57 45, 55 42, 52 40
+           C 50 42, 48 45, 47 48
+           C 46 52, 46 55, 47 58
+           C 46 60, 46 63, 47 65
+           C 46 68, 47 72, 47 78
+           C 47 82, 46 85, 47 88
+           C 47 91, 48 94, 49 96
+           C 50 98, 52 96, 52 94
+           C 52 91, 51.5 88, 51.5 85
+           C 51.5 82, 52 80, 53 78
+           C 53 76, 53 72, 52 70
+           C 51 69, 51 66, 52 64
+           C 53 63, 53 60, 52 58
+           C 51 55, 51 52, 52 48
+           C 53 45, 55 42, 52 40
+           Z" 
+        fill="url(#femaleGrad)" opacity="0.95" stroke="#FF6699" stroke-width="1" stroke-linejoin="round"/>
+  
+  <!-- Chest curve -->
+  <ellipse cx="37.5" cy="62" rx="12" ry="9" fill="url(#femaleGrad)" opacity="0.95"/>
+  
+  <!-- Left arm -->
+  <path d="M 22 48
+           C 20 50, 18 53, 16 58
+           L 16 118
+           C 16 121, 18 123, 21 122
+           L 22 58
+           Z" 
+        fill="url(#femaleGrad)" opacity="0.95"/>
+  
+  <!-- Right arm -->
+  <path d="M 58 48
+           C 60 50, 62 53, 64 58
+           L 64 118
+           C 64 121, 62 123, 59 122
+           L 58 58
+           Z" 
+        fill="url(#femaleGrad)" opacity="0.95"/>
+  
+  <!-- Feet -->
+  <ellipse cx="30" cy="200" rx="4.5" ry="2.5" fill="url(#femaleGrad)"/>
+  <ellipse cx="45" cy="200" rx="4.5" ry="2.5" fill="url(#femaleGrad)"/>
+</svg>

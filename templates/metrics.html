@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Metrik Tubuh — Health Checker{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <header>
+      <p class="badge emergency">Metrik Kesehatan</p>
+      <h1>Indeks Massa Tubuh (BMI)</h1>
+      <p class="lead">Masukkan berat dan tinggi badan dalam satuan metrik atau imperial untuk mendapatkan perhitungan BMI yang nyata.</p>
+    </header>
+
+    <form class="card" method="post" action="/metrics">
+      <div class="card card-nested">
+        <legend>Profil Anda</legend>
+        <div class="form-grid">
+          <label class="input-field">
+            <span>Nama (opsional)</span>
+            <input type="text" name="name" value="{{ defaults.name }}" placeholder="masukkan nama Anda">
+          </label>
+          <label class="input-field">
+            <span>Berat</span>
+            <input type="number" step="0.1" name="weight" value="{{ defaults.weight }}" placeholder="contoh: 70" required>
+          </label>
+          <label class="input-field">
+            <span>Tinggi</span>
+            <input type="number" step="0.1" name="height" value="{{ defaults.height }}" placeholder="contoh: 175" required>
+          </label>
+        </div>
+        <div class="unit-toggle">
+          <label>
+            <input type="radio" name="units" value="metric" {% if defaults.units == 'metric' %}checked{% endif %}>
+            Metric (kg / cm)
+          </label>
+          <label>
+            <input type="radio" name="units" value="imperial" {% if defaults.units == 'imperial' %}checked{% endif %}>
+            Imperial (lbs / inches)
+          </label>
+        </div>
+      </div>
+
+      <div class="card card-nested">
+        <legend>Perbandingan Tinggi (opsional)</legend>
+        <p class="meta">Tambahkan hingga 3 profil untuk melihat visual tinggi berdampingan secara real-time.</p>
+        <div class="comparison-grid">
+          {% for row in comparison_defaults %}
+          <div class="compare-row">
+            <label class="input-field">
+              <span>Nama</span>
+              <input type="text" name="compare_name" value="{{ row.name }}" placeholder="mis. Abib">
+            </label>
+            <label class="input-field">
+              <span>Tinggi (cm)</span>
+              <input type="number" step="0.1" name="compare_height" value="{{ row.height }}" placeholder="mis. 175">
+            </label>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <button type="submit">Hitung BMI</button>
+    </form>
+
+    {% if error %}
+    <div class="card">
+      <p class="error">{{ error }}</p>
+    </div>
+    {% endif %}
+
+    {% if result %}
+    <div class="card">
+      <p class="badge">Hasil Perhitungan</p>
+      {% if result.name %}
+      <h2>{{ result.name }}</h2>
+      {% endif %}
+      <h2>BMI: {{ result.bmi }}</h2>
+      <p>Kategori WHO: <strong>{{ result.bmi_category }}</strong></p>
+      <div class="meta">
+        Detail: berat {{ result.weight }} {{ 'kg' if result.units == 'metric' else 'lbs' }}, tinggi {{ result.height }} {{ 'cm' if result.units == 'metric' else 'in' }}
+      </div>
+      <div class="meta">
+        Rumus: BMI = berat (kg) / (tinggi (m))². Contoh nyata: 70 kg / (1.75 m)² = 22.86 (kategori Normal).
+      </div>
+    </div>
+    {% endif %}
+
+    {% if result %}
+    <div class="card">
+      <p class="badge">Penjelasan BMI</p>
+      <p><strong>Apa arti angka BMI?</strong> BMI membantu mengklasifikasikan komposisi tubuh secara umum, namun tidak menggantikan pemeriksaan klinis.</p>
+      <ul>
+        <li><strong>&lt; 18.5</strong> — Underweight: perlu evaluasi pola makan/gizi.</li>
+        <li><strong>18.5 - 24.9</strong> — Normal: jaga pola hidup sehat.</li>
+        <li><strong>25.0 - 29.9</strong> — Overweight: mulai evaluasi aktivitas fisik & pola makan.</li>
+        <li><strong>≥ 30.0</strong> — Obesity: konsultasi tenaga kesehatan untuk rencana penurunan berat badan.</li>
+      </ul>
+      <p class="meta">Catatan: BMI tidak menggambarkan massa otot atau distribusi lemak secara detail.</p>
+    </div>
+    {% endif %}
+
+    {% if compare_error %}
+    <div class="card">
+      <p class="error">{{ compare_error }}</p>
+    </div>
+    {% endif %}
+
+    {% if comparison_results %}
+    <div class="card">
+      <p class="badge">Height Comparison</p>
+      <div class="height-chart">
+        {% for item in comparison_results %}
+        <div class="person-bar">
+          <div class="figure" data-height="{{ item.percent }}"></div>
+          <span class="person-name">{{ item.name }}</span>
+          <span class="person-height">{{ item.height_cm }} cm</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <script>
+      (function() {
+        var bars = document.querySelectorAll('.figure[data-height]');
+        bars.forEach(function(bar) {
+          var height = bar.getAttribute('data-height');
+          if (height) {
+            bar.style.height = height + '%';
+          }
+        });
+      })();
+    </script>
+    {% endif %}
+
+    <a class="nav-link" href="/">← Kembali ke Beranda</a>
+  </div>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Perbandingan Tinggi — Health Checker{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header>
+    <p class="badge emergency">Perbandingan Visual</p>
+    <h1>Perbandingan Tinggi Badan</h1>
+    <p class="lead">Masukkan tinggi badan beberapa orang untuk melihat perbandingan visual secara berdampingan.</p>
+  </header>
+
+  <form class="card" method="post" action="/compare">
+    <div class="card card-nested">
+      <legend>Profil Utama</legend>
+      <div class="form-grid">
+        <label class="input-field">
+          <span>Nama</span>
+          <input type="text" name="name" value="{{ defaults.name }}" placeholder="masukkan nama Anda" required>
+        </label>
+        <label class="input-field">
+          <span>Tinggi (cm)</span>
+          <input type="number" step="0.1" name="height" value="{{ defaults.height }}" placeholder="contoh: 175"
+            required>
+        </label>
+        <label class="input-field">
+          <span>Jenis Kelamin</span>
+          <select name="gender" required>
+            <option value="male" {% if defaults.gender=='male' %}selected{% endif %}>Laki-laki</option>
+            <option value="female" {% if defaults.gender=='female' %}selected{% endif %}>Wanita</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div class="card card-nested">
+      <legend>Profil Perbandingan (opsional)</legend>
+      <p class="meta">Tambahkan hingga 3 profil untuk melihat visual tinggi berdampingan secara real-time.</p>
+      <div class="comparison-grid">
+        {% for row in comparison_defaults %}
+        <div class="compare-row">
+          <label class="input-field">
+            <span>Nama</span>
+            <input type="text" name="compare_name" value="{{ row.name }}" placeholder="mis. Abib">
+          </label>
+          <label class="input-field">
+            <span>Tinggi (cm)</span>
+            <input type="number" step="0.1" name="compare_height" value="{{ row.height }}" placeholder="mis. 175">
+          </label>
+          <label class="input-field">
+            <span>Jenis Kelamin</span>
+            <select name="compare_gender">
+              <option value="">-- Pilih --</option>
+              <option value="male" {% if row.gender=='male' %}selected{% endif %}>Laki-laki</option>
+              <option value="female" {% if row.gender=='female' %}selected{% endif %}>Wanita</option>
+            </select>
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <button type="submit">Lihat Perbandingan</button>
+  </form>
+
+  {% if error %}
+  <div class="card">
+    <p class="error">{{ error }}</p>
+  </div>
+  {% endif %}
+
+  {% if compare_error %}
+  <div class="card">
+    <p class="error">{{ compare_error }}</p>
+  </div>
+  {% endif %}
+
+  {% if comparison_results %}
+  <div class="card">
+    <p class="badge">Perbandingan Tinggi</p>
+    <div class="height-chart-container">
+      <div class="height-chart-axis">
+        {% for cm in range(210, -1, -10) %}
+        <div class="axis-label" data-cm="{{ cm }}">{{ cm }}</div>
+        {% endfor %}
+      </div>
+      <div class="height-chart" id="heightChart">
+        {% set max_height = comparison_results | map(attribute='height_cm') | max %}
+        {% for item in comparison_results %}
+        <div class="person-bar">
+          <div class="figure" data-height="{{ item.height_cm }}" data-gender="{{ item.gender or 'male' }}"
+            data-name="{{ item.name }}">
+            <div class="silhouette silhouette-{{ item.gender or 'male' }}">
+              <div class="silhouette-label">{{ item.name }}<br>{{ item.height_cm }} cm</div>
+              <div class="silhouette-head"></div>
+              <div class="silhouette-neck"></div>
+              <div class="silhouette-torso">
+                <div class="silhouette-shoulders"></div>
+                <div class="silhouette-arm silhouette-arm-left"></div>
+                <div class="silhouette-arm silhouette-arm-right"></div>
+                <div class="silhouette-chest"></div>
+                <div class="silhouette-waist"></div>
+                <div class="silhouette-hips"></div>
+              </div>
+              <div class="silhouette-legs">
+                <div class="silhouette-leg"></div>
+                <div class="silhouette-leg"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var chart = document.getElementById('heightChart');
+      var container = chart.closest('.height-chart-container');
+      var figures = chart.querySelectorAll('.figure[data-height]');
+      var heights = Array.from(figures).map(function (f) {
+        return parseFloat(f.getAttribute('data-height'));
+      });
+
+      // Set chart height to 210cm scale (630px = 210cm, so 1cm = 3px)
+      // On mobile, use smaller height (400px)
+      var chartHeightPx = window.innerWidth < 480 ? 400 : 630;
+      container.style.minHeight = chartHeightPx + 'px';
+      chart.style.height = chartHeightPx + 'px';
+
+      // Position axis labels
+      var axisLabels = document.querySelectorAll('.axis-label[data-cm]');
+      axisLabels.forEach(function (label) {
+        var cm = parseFloat(label.getAttribute('data-cm'));
+        var bottomPercent = (cm / 210) * 100;
+        label.style.bottom = bottomPercent + '%';
+      });
+
+      figures.forEach(function (figure) {
+        var heightCm = parseFloat(figure.getAttribute('data-height'));
+        var silhouette = figure.querySelector('.silhouette');
+
+        // Scale: 1cm = 3px (630px / 210cm)
+        // Siluet dimulai dari bottom: 0, jadi tinggi langsung sesuai skala
+        var heightPx = (heightCm / 210) * chartHeightPx;
+        var minHeightPx = 120;
+        var finalHeight = Math.max(minHeightPx, heightPx);
+        silhouette.style.height = finalHeight + 'px';
+
+        // Adjust leg height proportionally (legs should be about 45-50% of total height)
+        var legs = silhouette.querySelectorAll('.silhouette-leg');
+        var legHeight = finalHeight * 0.48; // 48% of total height for legs
+        legs.forEach(function (leg) {
+          leg.style.height = Math.max(50, legHeight) + 'px';
+        });
+      });
+    })();
+  </script>
+  {% endif %}
+
+  <a class="nav-link" href="/">← Kembali ke Beranda</a>
+</div>
+{% endblock %}

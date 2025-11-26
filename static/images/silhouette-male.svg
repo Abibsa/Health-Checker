@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 200" preserveAspectRatio="xMidYMax meet">
+  <defs>
+    <linearGradient id="maleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#66BBFF;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#3399FF;stop-opacity:0.9" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Smooth male silhouette - standing pose -->
+  <path d="M 40 8
+           C 36 8, 32 10, 32 14
+           C 32 18, 34 20, 36 22
+           C 38 24, 40 24, 42 22
+           C 44 20, 46 18, 46 14
+           C 46 10, 44 8, 40 8
+           Z
+           M 38 24
+           L 38 38
+           L 42 38
+           L 42 24
+           Z
+           M 30 40
+           C 26 42, 23 45, 22 50
+           C 21 55, 21 60, 22 65
+           C 20 68, 18 72, 18 78
+           L 18 125
+           C 18 128, 20 130, 23 131
+           C 26 132, 28 134, 30 135
+           L 30 170
+           C 30 175, 32 178, 35 180
+           C 32 182, 30 185, 30 190
+           L 30 195
+           C 30 198, 32 200, 35 200
+           L 40 200
+           L 45 200
+           C 48 200, 50 198, 50 195
+           L 50 190
+           C 50 185, 48 182, 45 180
+           C 48 178, 50 175, 50 170
+           L 50 135
+           C 52 134, 54 132, 57 131
+           C 60 130, 62 128, 62 125
+           L 62 78
+           C 62 72, 60 68, 58 65
+           C 59 60, 59 55, 58 50
+           C 57 45, 54 42, 50 40
+           Z" 
+        fill="url(#maleGrad)" opacity="0.95" stroke="#66BBFF" stroke-width="1" stroke-linejoin="round"/>
+  
+  <!-- Left arm -->
+  <path d="M 22 50
+           C 20 52, 18 55, 16 60
+           L 16 120
+           C 16 123, 18 125, 21 124
+           L 22 65
+           Z" 
+        fill="url(#maleGrad)" opacity="0.95"/>
+  
+  <!-- Right arm -->
+  <path d="M 58 50
+           C 60 52, 62 55, 64 60
+           L 64 120
+           C 64 123, 62 125, 59 124
+           L 58 65
+           Z" 
+        fill="url(#maleGrad)" opacity="0.95"/>
+  
+  <!-- Feet -->
+  <ellipse cx="33" cy="200" rx="5" ry="3" fill="url(#maleGrad)"/>
+  <ellipse cx="47" cy="200" rx="5" ry="3" fill="url(#maleGrad)"/>
+</svg>

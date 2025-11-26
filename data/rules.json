@@ -1,0 +1,603 @@
+[
+  {
+    "id": "r_emg_cardiac_1",
+    "conditions": [
+      "chest_pain",
+      "shortness_of_breath",
+      "irregular_heartbeat"
+    ],
+    "conclusion": "DARURAT: Kemungkinan serangan jantung atau masalah kardiovaskular serius.",
+    "advice": "Segera hubungi layanan gawat darurat (119/112) atau pergi ke Unit Gawat Darurat terdekat. Jangan mengemudi sendiri.",
+    "priority": 0
+  },
+  {
+    "id": "r_emg_cardiac_2",
+    "conditions": [
+      "chest_pain",
+      "shortness_of_breath"
+    ],
+    "conclusion": "DARURAT: Kemungkinan masalah jantung atau pernapasan serius.",
+    "advice": "Segera cari pertolongan medis darurat (RS/Unit Gawat Darurat). Hindari aktivitas fisik berat.",
+    "priority": 0
+  },
+  {
+    "id": "r_emg_stroke",
+    "conditions": [
+      "confusion",
+      "weakness",
+      "numbness",
+      "vision_blurred"
+    ],
+    "conclusion": "DARURAT: Kemungkinan stroke atau gangguan neurologis akut.",
+    "advice": "Segera hubungi layanan gawat darurat. Waktu sangat penting dalam penanganan stroke. Catat waktu munculnya gejala.",
+    "priority": 0
+  },
+  {
+    "id": "r_emg_meningitis",
+    "conditions": [
+      "headache",
+      "stiff_neck",
+      "fever",
+      "confusion"
+    ],
+    "conclusion": "DARURAT: Kemungkinan meningitis atau infeksi sistem saraf pusat.",
+    "advice": "Segera konsultasi ke Unit Gawat Darurat. Meningitis membutuhkan penanganan medis segera.",
+    "priority": 0
+  },
+  {
+    "id": "r_emg_seizure",
+    "conditions": [
+      "seizure",
+      "confusion"
+    ],
+    "conclusion": "DARURAT: Kejang membutuhkan evaluasi medis segera.",
+    "advice": "Segera hubungi layanan gawat darurat. Jangan memasukkan apapun ke mulut pasien. Baringkan di tempat aman.",
+    "priority": 0
+  },
+  {
+    "id": "r_emg_diabetic_emergency",
+    "conditions": [
+      "excessive_thirst",
+      "frequent_urination",
+      "confusion",
+      "weakness"
+    ],
+    "conclusion": "DARURAT: Kemungkinan krisis diabetes (hiperglikemia atau hipoglikemia).",
+    "advice": "Segera periksakan kadar gula darah dan hubungi layanan medis. Jika memiliki diabetes, periksa kadar gula segera.",
+    "priority": 0
+  },
+  {
+    "id": "r_emg_obesity_resp",
+    "conditions": [
+      "shortness_of_breath",
+      "chest_tightness"
+    ],
+    "bmi_category": "Obesity",
+    "conclusion": "DARURAT: Obesitas dengan sesak napas meningkatkan risiko masalah kardiovaskular atau pernapasan serius.",
+    "advice": "Segera periksakan diri ke fasilitas kesehatan dan lakukan evaluasi jantung serta paru-paru.",
+    "priority": 0
+  },
+  {
+    "id": "r_emg_obesity_cardiac",
+    "conditions": [
+      "chest_pain",
+      "irregular_heartbeat"
+    ],
+    "bmi_category": "Obesity",
+    "conclusion": "DARURAT: Obesitas dengan gejala jantung memerlukan evaluasi medis segera.",
+    "advice": "Segera ke Unit Gawat Darurat untuk pemeriksaan EKG dan evaluasi jantung lengkap.",
+    "priority": 0
+  },
+  {
+    "id": "r_covid_high_prob",
+    "conditions": [
+      "fever",
+      "cough",
+      "loss_of_smell",
+      "loss_of_taste",
+      "fatigue"
+    ],
+    "conclusion": "Kemungkinan Tinggi: COVID-19 dengan gejala khas (hilang penciuman/pengecapan).",
+    "advice": "Isolasi mandiri segera, lakukan tes antigen atau PCR. Pantau saturasi oksigen. Hubungi layanan kesehatan jika sesak napas atau kondisi memburuk.",
+    "priority": 1
+  },
+  {
+    "id": "r_covid_moderate",
+    "conditions": [
+      "fever",
+      "cough",
+      "loss_of_smell"
+    ],
+    "conclusion": "Kemungkinan: COVID-19 (gejala hilang penciuman).",
+    "advice": "Isolasi mandiri, lakukan tes antigen atau PCR, hubungi layanan kesehatan jika kondisi memburuk.",
+    "priority": 1
+  },
+  {
+    "id": "r_covid_mild",
+    "conditions": [
+      "fever",
+      "cough",
+      "sore_throat",
+      "fatigue",
+      "loss_of_taste"
+    ],
+    "conclusion": "Kemungkinan: COVID-19 atau infeksi virus pernapasan lainnya.",
+    "advice": "Pertimbangkan tes COVID-19 jika ada riwayat kontak. Istirahat, isolasi mandiri, minum banyak cairan. Konsultasi dokter jika gejala memburuk.",
+    "priority": 2
+  },
+  {
+    "id": "r_flu_severe",
+    "conditions": [
+      "fever",
+      "cough",
+      "sore_throat",
+      "body_aches",
+      "chills",
+      "fatigue"
+    ],
+    "conclusion": "Kemungkinan: Influenza (Flu) dengan gejala lengkap.",
+    "advice": "Istirahat total, minum cairan yang cukup, kompres hangat untuk demam. Pertimbangkan antivirus jika dalam 48 jam pertama. Konsultasi dokter jika demam tinggi (>38.5°C) atau gejala berlanjut lebih dari 5 hari.",
+    "priority": 1
+  },
+  {
+    "id": "r_flu_moderate",
+    "conditions": [
+      "fever",
+      "cough",
+      "sore_throat",
+      "body_aches"
+    ],
+    "conclusion": "Kemungkinan: Influenza atau Common Cold.",
+    "advice": "Istirahat, minum cairan yang cukup, kompres hangat untuk demam. Konsultasi ke dokter jika demam tinggi atau gejala berlanjut.",
+    "priority": 2
+  },
+  {
+    "id": "r_flu_mild",
+    "conditions": [
+      "fever",
+      "cough",
+      "sore_throat"
+    ],
+    "conclusion": "Kemungkinan: Common Cold atau Influenza ringan.",
+    "advice": "Istirahat, minum cairan yang cukup, kompres hangat untuk demam. Konsultasi ke dokter jika demam tinggi atau gejala berlanjut.",
+    "priority": 2
+  },
+  {
+    "id": "r_pneumonia",
+    "conditions": [
+      "fever",
+      "cough_with_phlegm",
+      "shortness_of_breath",
+      "chest_pain",
+      "fatigue"
+    ],
+    "conclusion": "Kemungkinan: Pneumonia atau infeksi paru-paru.",
+    "advice": "Segera konsultasi dokter untuk pemeriksaan rontgen dada dan evaluasi lebih lanjut. Pneumonia membutuhkan pengobatan antibiotik.",
+    "priority": 1
+  },
+  {
+    "id": "r_bronchitis",
+    "conditions": [
+      "cough_with_phlegm",
+      "shortness_of_breath",
+      "wheezing",
+      "chest_tightness"
+    ],
+    "conclusion": "Kemungkinan: Bronkitis akut atau kronis.",
+    "advice": "Hindari asap rokok dan polusi. Minum banyak air putih. Konsultasi dokter untuk evaluasi dan pengobatan yang tepat.",
+    "priority": 2
+  },
+  {
+    "id": "r_asthma_attack",
+    "conditions": [
+      "wheezing",
+      "shortness_of_breath",
+      "chest_tightness",
+      "rapid_breathing"
+    ],
+    "conclusion": "Kemungkinan: Serangan asma atau bronkospasme.",
+    "advice": "Gunakan inhaler jika tersedia. Jika tidak membaik dalam 15 menit atau memburuk, segera ke Unit Gawat Darurat.",
+    "priority": 1
+  },
+  {
+    "id": "r_allergic_rhinitis",
+    "conditions": [
+      "sneezing",
+      "runny_nose",
+      "congested_nose",
+      "watery_eyes",
+      "itching"
+    ],
+    "conclusion": "Kemungkinan: Rinitis alergi (hay fever).",
+    "advice": "Hindari pemicu alergen. Pertimbangkan antihistamin. Konsultasi dokter untuk pengobatan jangka panjang jika gejala persisten.",
+    "priority": 3
+  },
+  {
+    "id": "r_allergy_mild",
+    "conditions": [
+      "cough",
+      "runny_nose",
+      "sneezing"
+    ],
+    "conclusion": "Kemungkinan: Alergi atau rinitis non-infeksius.",
+    "advice": "Perhatikan pemicu alergen. Jika perlu, konsultasi dokter untuk obat antihistamin.",
+    "priority": 3
+  },
+  {
+    "id": "r_allergic_reaction",
+    "conditions": [
+      "hives",
+      "swelling",
+      "itching",
+      "rash",
+      "shortness_of_breath"
+    ],
+    "conclusion": "DARURAT: Reaksi alergi parah (anafilaksis).",
+    "advice": "Segera hubungi layanan gawat darurat. Jika memiliki epinephrine auto-injector, gunakan segera.",
+    "priority": 0
+  },
+  {
+    "id": "r_migraine",
+    "conditions": [
+      "headache",
+      "nausea",
+      "vision_blurred",
+      "dizziness"
+    ],
+    "conclusion": "Kemungkinan: Migrain atau sakit kepala vaskular.",
+    "advice": "Istirahat di ruangan gelap dan tenang. Hindari pemicu seperti cahaya terang, suara keras, atau makanan tertentu. Konsultasi dokter untuk pengobatan preventif jika sering terjadi.",
+    "priority": 2
+  },
+  {
+    "id": "r_tension_headache",
+    "conditions": [
+      "headache",
+      "stiff_neck",
+      "muscle_pain"
+    ],
+    "conclusion": "Kemungkinan: Sakit kepala tegang (tension headache).",
+    "advice": "Istirahat, kompres hangat di leher, pijat ringan. Jika sering terjadi, konsultasi dokter untuk evaluasi lebih lanjut.",
+    "priority": 3
+  },
+  {
+    "id": "r_vertigo_benign",
+    "conditions": [
+      "vertigo",
+      "nausea",
+      "dizziness"
+    ],
+    "conclusion": "Kemungkinan: Vertigo posisional paroksismal jinak (BPPV) atau gangguan keseimbangan.",
+    "advice": "Hindari gerakan kepala tiba-tiba. Konsultasi dokter THT atau neurologis untuk evaluasi dan manuver reposisi jika diperlukan.",
+    "priority": 2
+  },
+  {
+    "id": "r_gastroenteritis",
+    "conditions": [
+      "nausea",
+      "vomiting",
+      "diarrhea",
+      "abdominal_pain",
+      "fever"
+    ],
+    "conclusion": "Kemungkinan: Gastroenteritis (infeksi saluran pencernaan).",
+    "advice": "Minum banyak cairan untuk mencegah dehidrasi (oralit jika perlu). Hindari makanan padat sementara. Konsultasi dokter jika muntah atau diare berlanjut lebih dari 24 jam, atau ada tanda dehidrasi.",
+    "priority": 2
+  },
+  {
+    "id": "r_food_poisoning",
+    "conditions": [
+      "nausea",
+      "vomiting",
+      "diarrhea",
+      "stomach_cramps",
+      "fever"
+    ],
+    "conclusion": "Kemungkinan: Keracunan makanan atau infeksi bakteri.",
+    "advice": "Hindari makanan padat, minum banyak cairan. Jika gejala parah atau berlanjut lebih dari 24 jam, konsultasi dokter. Perhatikan tanda dehidrasi.",
+    "priority": 2
+  },
+  {
+    "id": "r_ibs",
+    "conditions": [
+      "abdominal_pain",
+      "bloating",
+      "diarrhea",
+      "constipation"
+    ],
+    "conclusion": "Kemungkinan: Irritable Bowel Syndrome (IBS) atau gangguan pencernaan fungsional.",
+    "advice": "Perhatikan pola makan dan pemicu gejala. Konsultasi dokter gastroenterologi untuk diagnosis dan pengobatan yang tepat.",
+    "priority": 3
+  },
+  {
+    "id": "r_uti",
+    "conditions": [
+      "frequent_urination",
+      "painful_urination",
+      "blood_in_urine",
+      "abdominal_pain"
+    ],
+    "conclusion": "Kemungkinan: Infeksi Saluran Kemih (ISK/UTI).",
+    "advice": "Minum banyak air putih. Segera konsultasi dokter untuk pengobatan antibiotik. ISK yang tidak diobati dapat menyebabkan komplikasi serius.",
+    "priority": 2
+  },
+  {
+    "id": "r_uti_mild",
+    "conditions": [
+      "frequent_urination",
+      "painful_urination"
+    ],
+    "conclusion": "Kemungkinan: Infeksi Saluran Kemih ringan.",
+    "advice": "Minum banyak air putih dan cranberry juice. Konsultasi dokter jika gejala berlanjut lebih dari 24 jam.",
+    "priority": 3
+  },
+  {
+    "id": "r_kidney_stone",
+    "conditions": [
+      "abdominal_pain",
+      "blood_in_urine",
+      "frequent_urination",
+      "nausea"
+    ],
+    "conclusion": "Kemungkinan: Batu ginjal atau kolik ginjal.",
+    "advice": "Minum banyak air putih. Segera konsultasi dokter atau ke Unit Gawat Darurat jika nyeri sangat parah. Mungkin diperlukan pemeriksaan USG atau CT scan.",
+    "priority": 1
+  },
+  {
+    "id": "r_ear_infection",
+    "conditions": [
+      "ear_pain",
+      "hearing_loss",
+      "fever",
+      "dizziness"
+    ],
+    "conclusion": "Kemungkinan: Infeksi telinga tengah (otitis media).",
+    "advice": "Konsultasi dokter THT untuk evaluasi dan pengobatan antibiotik jika diperlukan. Jangan memasukkan apapun ke telinga.",
+    "priority": 2
+  },
+  {
+    "id": "r_conjunctivitis",
+    "conditions": [
+      "red_eyes",
+      "watery_eyes",
+      "itching",
+      "eye_discharge"
+    ],
+    "conclusion": "Kemungkinan: Konjungtivitis (mata merah) - infeksi atau alergi.",
+    "advice": "Hindari menyentuh mata, cuci tangan sering. Konsultasi dokter mata untuk evaluasi dan pengobatan yang tepat.",
+    "priority": 3
+  },
+  {
+    "id": "r_skin_infection",
+    "conditions": [
+      "rash",
+      "skin_redness",
+      "swelling",
+      "fever"
+    ],
+    "conclusion": "Kemungkinan: Infeksi kulit atau selulitis.",
+    "advice": "Jaga kebersihan area yang terkena. Konsultasi dokter untuk evaluasi dan pengobatan antibiotik jika diperlukan.",
+    "priority": 2
+  },
+  {
+    "id": "r_dermatitis",
+    "conditions": [
+      "rash",
+      "itching",
+      "skin_redness"
+    ],
+    "conclusion": "Kemungkinan: Dermatitis kontak atau eksim.",
+    "advice": "Hindari pemicu iritan atau alergen. Gunakan pelembab kulit. Konsultasi dokter kulit jika gejala persisten.",
+    "priority": 3
+  },
+  {
+    "id": "r_mononucleosis",
+    "conditions": [
+      "fever",
+      "sore_throat",
+      "fatigue",
+      "body_aches",
+      "swelling"
+    ],
+    "conclusion": "Kemungkinan: Mononukleosis infeksiosa atau infeksi virus lainnya.",
+    "advice": "Istirahat total, minum banyak cairan. Hindari aktivitas fisik berat. Konsultasi dokter untuk konfirmasi diagnosis.",
+    "priority": 2
+  },
+  {
+    "id": "r_chronic_fatigue",
+    "conditions": [
+      "fatigue",
+      "body_aches",
+      "joint_pain",
+      "memory_loss",
+      "headache"
+    ],
+    "conclusion": "Kemungkinan: Sindrom kelelahan kronis atau kondisi sistemik lainnya.",
+    "advice": "Konsultasi dokter untuk evaluasi menyeluruh. Perhatikan pola tidur, diet, dan aktivitas fisik. Mungkin diperlukan pemeriksaan laboratorium.",
+    "priority": 3
+  },
+  {
+    "id": "r_arthritis",
+    "conditions": [
+      "joint_pain",
+      "swelling",
+      "stiff_neck",
+      "muscle_pain"
+    ],
+    "conclusion": "Kemungkinan: Artritis atau gangguan sendi inflamasi.",
+    "advice": "Istirahat sendi yang terkena, kompres hangat atau dingin. Konsultasi dokter reumatologi untuk evaluasi dan pengobatan.",
+    "priority": 3
+  },
+  {
+    "id": "r_hypertension_crisis",
+    "conditions": [
+      "high_blood_pressure",
+      "headache",
+      "dizziness",
+      "chest_pain"
+    ],
+    "conclusion": "DARURAT: Krisis hipertensi atau tekanan darah sangat tinggi.",
+    "advice": "Segera ke Unit Gawat Darurat untuk evaluasi dan penanganan tekanan darah. Hipertensi yang tidak terkontrol dapat menyebabkan stroke atau serangan jantung.",
+    "priority": 0
+  },
+  {
+    "id": "r_hypotension",
+    "conditions": [
+      "low_blood_pressure",
+      "dizziness",
+      "weakness",
+      "fatigue"
+    ],
+    "conclusion": "Kemungkinan: Hipotensi atau tekanan darah rendah.",
+    "advice": "Minum banyak cairan, hindari berdiri tiba-tiba. Konsultasi dokter untuk evaluasi penyebab dan pengobatan.",
+    "priority": 2
+  },
+  {
+    "id": "r_anemia",
+    "conditions": [
+      "fatigue",
+      "weakness",
+      "dizziness",
+      "shortness_of_breath",
+      "pale_skin"
+    ],
+    "conclusion": "Kemungkinan: Anemia atau kekurangan sel darah merah.",
+    "advice": "Konsultasi dokter untuk pemeriksaan darah lengkap. Perhatikan asupan zat besi dan vitamin B12 dalam diet.",
+    "priority": 2
+  },
+  {
+    "id": "r_thyroid_hyper",
+    "conditions": [
+      "irregular_heartbeat",
+      "excessive_thirst",
+      "fatigue",
+      "weight_loss",
+      "anxiety"
+    ],
+    "conclusion": "Kemungkinan: Hipertiroidisme atau gangguan tiroid.",
+    "advice": "Konsultasi dokter endokrinologi untuk evaluasi fungsi tiroid. Pemeriksaan TSH, T3, T4 diperlukan.",
+    "priority": 2
+  },
+  {
+    "id": "r_thyroid_hypo",
+    "conditions": [
+      "fatigue",
+      "weakness",
+      "weight_gain",
+      "constipation",
+      "depression"
+    ],
+    "conclusion": "Kemungkinan: Hipotiroidisme atau gangguan tiroid.",
+    "advice": "Konsultasi dokter endokrinologi untuk evaluasi fungsi tiroid dan pengobatan pengganti hormon jika diperlukan.",
+    "priority": 3
+  },
+  {
+    "id": "r_diabetes_type2",
+    "conditions": [
+      "excessive_thirst",
+      "frequent_urination",
+      "fatigue",
+      "blurred_vision"
+    ],
+    "bmi_category": "Obesity",
+    "conclusion": "Kemungkinan: Diabetes Tipe 2 atau prediabetes.",
+    "advice": "Segera konsultasi dokter untuk pemeriksaan gula darah (HbA1c, glukosa puasa). Perubahan gaya hidup dan diet sangat penting.",
+    "priority": 1
+  },
+  {
+    "id": "r_diabetes_symptoms",
+    "conditions": [
+      "excessive_thirst",
+      "frequent_urination",
+      "fatigue"
+    ],
+    "conclusion": "Kemungkinan: Diabetes atau gangguan metabolik.",
+    "advice": "Konsultasi dokter untuk pemeriksaan gula darah. Perhatikan pola makan dan aktivitas fisik.",
+    "priority": 2
+  },
+  {
+    "id": "r_obesity_metabolic",
+    "conditions": [
+      "fatigue",
+      "shortness_of_breath",
+      "joint_pain"
+    ],
+    "bmi_category": "Obesity",
+    "conclusion": "Obesitas dengan gejala metabolik memerlukan evaluasi kesehatan menyeluruh.",
+    "advice": "Konsultasi dokter untuk evaluasi risiko kardiovaskular dan metabolik. Program penurunan berat badan yang terstruktur sangat disarankan.",
+    "priority": 2
+  },
+  {
+    "id": "r_obesity_sleep_apnea",
+    "conditions": [
+      "fatigue",
+      "snoring",
+      "shortness_of_breath",
+      "daytime_sleepiness"
+    ],
+    "bmi_category": "Obesity",
+    "conclusion": "Kemungkinan: Sleep Apnea atau gangguan tidur terkait obesitas.",
+    "advice": "Konsultasi dokter untuk evaluasi sleep study. Penurunan berat badan dan CPAP mungkin diperlukan.",
+    "priority": 2
+  },
+  {
+    "id": "r_anxiety_panic",
+    "conditions": [
+      "rapid_breathing",
+      "chest_tightness",
+      "dizziness",
+      "irregular_heartbeat",
+      "numbness"
+    ],
+    "conclusion": "Kemungkinan: Serangan panik atau gangguan kecemasan.",
+    "advice": "Coba teknik pernapasan dalam dan relaksasi. Konsultasi dokter atau psikolog untuk evaluasi dan pengobatan jika sering terjadi.",
+    "priority": 2
+  },
+  {
+    "id": "r_depression",
+    "conditions": [
+      "fatigue",
+      "loss_of_appetite",
+      "memory_loss",
+      "sleep_disturbance"
+    ],
+    "conclusion": "Kemungkinan: Depresi atau gangguan mood.",
+    "advice": "Konsultasi dokter atau psikolog untuk evaluasi. Dukungan sosial dan pengobatan dapat membantu.",
+    "priority": 3
+  },
+  {
+    "id": "r_common_cold",
+    "conditions": [
+      "runny_nose",
+      "sneezing",
+      "congested_nose",
+      "sore_throat"
+    ],
+    "conclusion": "Kemungkinan: Common Cold (pilek biasa).",
+    "advice": "Istirahat, minum banyak cairan, gunakan semprotan hidung saline. Gejala biasanya membaik dalam 7-10 hari.",
+    "priority": 4
+  },
+  {
+    "id": "r_sinusitis",
+    "conditions": [
+      "congested_nose",
+      "headache",
+      "facial_pain",
+      "runny_nose"
+    ],
+    "conclusion": "Kemungkinan: Sinusitis atau infeksi sinus.",
+    "advice": "Gunakan semprotan hidung saline, kompres hangat di wajah. Konsultasi dokter jika gejala berlanjut lebih dari 10 hari atau ada demam.",
+    "priority": 3
+  },
+  {
+    "id": "r_pharyngitis",
+    "conditions": [
+      "sore_throat",
+      "fever",
+      "difficulty_swallowing",
+      "swelling"
+    ],
+    "conclusion": "Kemungkinan: Faringitis atau radang tenggorokan.",
+    "advice": "Kumur dengan air garam hangat, minum banyak cairan. Konsultasi dokter untuk evaluasi apakah perlu antibiotik (jika bakteri).",
+    "priority": 3
+  }
+]

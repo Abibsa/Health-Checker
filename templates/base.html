@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}Health Checker — Sistem Cerdas{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/chat-widget.css">
+</head>
+
+<body>
+  <nav class="top-nav">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <div>
+        <strong>Health Checker</strong>
+        <small>Rule-Based Expert System</small>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="{% if request.path == '/' %}active{% endif %}">Beranda</a>
+      <a href="/diagnosa" class="{% if request.path.startswith('/diagnosa') %}active{% endif %}">Diagnosa</a>
+      <a href="/bmi" class="{% if request.path.startswith('/bmi') %}active{% endif %}">Hitung BMI</a>
+      <a href="/compare" class="{% if request.path.startswith('/compare') %}active{% endif %}">Perbandingan Tinggi</a>
+      <a href="/admin" class="{% if request.path.startswith('/admin') %}active{% endif %}">Daftar Rules</a>
+    </div>
+    <a class="nav-cta" href="/diagnosa">Mulai Diagnosa</a>
+  </nav>
+
+  <main>
+    <div class="page-wrapper">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <strong>Health Checker</strong>
+        <small>Sistem Pakar Berbasis Aturan</small>
+      </div>
+      <div class="footer-links">
+        <a href="/">Beranda</a>
+        <a href="/diagnosa">Diagnosa</a>
+        <a href="/bmi">BMI</a>
+        <a href="/compare">Bandingkan</a>
+        <a href="/admin">Admin</a>
+      </div>
+      <div class="footer-disclaimer">
+        <p><strong>Disclaimer Medis:</strong> Aplikasi ini adalah sistem pakar untuk tujuan edukasi dan informasi awal.
+          Hasil diagnosa <strong>bukan pengganti saran medis profesional</strong>. Segera hubungi dokter jika Anda
+          mengalami gejala serius.</p>
+      </div>
+      <div class="footer-copyright">
+        &copy; 2024 Health Checker. Dibuat untuk UAS Sistem Cerdas.
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/main.js"></script>
+  <script src="/static/js/chat-widget.js"></script>
+</body>
+
+</html>

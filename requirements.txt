@@ -1,0 +1,5 @@
+Flask>=2.0
+markdown2
+pypandoc
+pytest
+google-generativeai>=0.3.0

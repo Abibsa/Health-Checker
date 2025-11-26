@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Rules — Health Checker{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <header>
+      <p class="badge emergency">Panel Admin</p>
+      <h1>Daftar Rules</h1>
+      <p class="lead">Pantau dan verifikasi seluruh aturan yang digunakan mesin inferensi.</p>
+    </header>
+
+    <div class="card">
+      <p class="badge">Statistik Rules</p>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <strong>{{ rules | length }}</strong>
+          <span>Total Rules</span>
+        </div>
+        <div class="stat-item">
+          <strong>{{ rules | selectattr("priority", "equalto", 0) | list | length }}</strong>
+          <span>Rules Darurat</span>
+        </div>
+        <div class="stat-item">
+          <strong>{{ rules | selectattr("bmi_category") | list | length }}</strong>
+          <span>Dengan BMI</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rules-container">
+      {% for r in rules %}
+      <div class="rule-card {% if r.priority == 0 %}rule-emergency{% endif %}">
+        <div class="rule-header">
+          <div class="rule-id">{{ r.id }}</div>
+          <div class="rule-priority">
+            {% if r.priority == 0 %}
+              <span class="badge emergency">DARURAT</span>
+            {% elif r.priority == 1 %}
+              <span class="badge priority-high">Prioritas Tinggi</span>
+            {% elif r.priority == 2 %}
+              <span class="badge priority-medium">Prioritas Sedang</span>
+            {% else %}
+              <span class="badge priority-low">Prioritas Rendah</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="rule-section">
+          <h3 class="rule-section-title">Gejala yang Harus Dipenuhi</h3>
+          <div class="symptoms-list">
+            {% for cond in r.conditions %}
+              <span class="badge symptom-badge">{{ symptom_map.get(cond, cond) }}</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        {% if r.bmi_category %}
+        <div class="rule-section">
+          <h3 class="rule-section-title">Kategori BMI</h3>
+          <span class="badge bmi-badge">{{ r.bmi_category }}</span>
+        </div>
+        {% endif %}
+
+        <div class="rule-section">
+          <h3 class="rule-section-title">Kesimpulan</h3>
+          <p class="rule-conclusion">{{ r.conclusion }}</p>
+        </div>
+
+        <div class="rule-section">
+          <h3 class="rule-section-title">Saran</h3>
+          <p class="rule-advice">{{ r.advice }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <a class="nav-link" href="/">← Kembali ke Beranda</a>
+  </div>
+{% endblock %}

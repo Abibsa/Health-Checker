@@ -1,0 +1,605 @@
+{% extends "base.html" %}
+
+{% block title %}Chat AI — Health Checker{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">
+        <div class="chat-header-content">
+            <div class="chat-avatar">
+                <div class="avatar-icon">🤖</div>
+                <div class="avatar-status"></div>
+            </div>
+            <div class="chat-info">
+                <h2>Health Assistant AI</h2>
+                <p class="chat-status">Online • Siap membantu Anda</p>
+            </div>
+        </div>
+        <div class="chat-actions">
+            <button class="icon-btn" onclick="clearChat()" title="Hapus riwayat chat">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+        <div class="message bot-message">
+            <div class="message-avatar">🤖</div>
+            <div class="message-content">
+                <div class="message-bubble">
+                    <p>Halo! 👋 Saya adalah asisten kesehatan AI berbasis sistem pakar.</p>
+                    <p>Saya dapat membantu Anda menganalisis gejala yang Anda alami. Coba ceritakan gejala Anda,
+                        misalnya:</p>
+                    <ul>
+                        <li>"Saya merasa demam dan batuk"</li>
+                        <li>"Pusing dan mual sejak tadi pagi"</li>
+                        <li>"Berat badan 70 kg, tinggi 170 cm, sering pusing"</li>
+                    </ul>
+                    <p class="disclaimer-text">⚠️ <strong>Catatan:</strong> Hasil analisis ini bukan diagnosa medis.
+                        Untuk kondisi serius, segera konsultasi dengan dokter.</p>
+                </div>
+                <span class="message-time">Baru saja</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-input-container">
+        <div class="typing-indicator" id="typingIndicator" style="display: none;">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <span>AI sedang mengetik...</span>
+        </div>
+        <form class="chat-input-form" id="chatForm" onsubmit="sendMessage(event)">
+            <textarea id="messageInput" class="chat-input" placeholder="Ketik gejala yang Anda alami..." rows="1"
+                onkeydown="handleKeyPress(event)"></textarea>
+            <button type="submit" class="send-btn" id="sendBtn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+                </svg>
+            </button>
+        </form>
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="quickMessage('Saya merasa demam dan batuk')">🤒 Demam & Batuk</button>
+            <button class="quick-btn" onclick="quickMessage('Pusing dan mual')">😵 Pusing & Mual</button>
+            <button class="quick-btn" onclick="quickMessage('Sakit kepala parah')">🤕 Sakit Kepala</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .chat-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: var(--card);
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6);
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 200px);
+        min-height: 600px;
+    }
+
+    .chat-header {
+        background: linear-gradient(135deg, rgba(255, 42, 42, 0.1), rgba(255, 86, 86, 0.05));
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 20px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chat-header-content {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .chat-avatar {
+        position: relative;
+    }
+
+    .avatar-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--accent), #ff5656);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        box-shadow: 0 4px 12px rgba(255, 42, 42, 0.4);
+    }
+
+    .avatar-status {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 12px;
+        height: 12px;
+        background: #00ff88;
+        border: 2px solid var(--card);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+    }
+
+    .chat-info h2 {
+        margin: 0;
+        font-size: 1.3rem;
+    }
+
+    .chat-status {
+        margin: 4px 0 0 0;
+        font-size: 0.85rem;
+        color: var(--muted);
+    }
+
+    .chat-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .icon-btn {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 8px;
+        cursor: pointer;
+        color: var(--text);
+        transition: all 0.2s;
+    }
+
+    .icon-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        background: radial-gradient(circle at top right, rgba(255, 42, 42, 0.03), transparent 60%);
+    }
+
+    .message {
+        display: flex;
+        gap: 12px;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .message-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .bot-message .message-avatar {
+        background: linear-gradient(135deg, var(--accent), #ff5656);
+        box-shadow: 0 2px 8px rgba(255, 42, 42, 0.3);
+    }
+
+    .user-message {
+        flex-direction: row-reverse;
+    }
+
+    .user-message .message-avatar {
+        background: linear-gradient(135deg, #4da3ff, #66bbff);
+        box-shadow: 0 2px 8px rgba(77, 163, 255, 0.3);
+    }
+
+    .message-content {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        max-width: 70%;
+    }
+
+    .user-message .message-content {
+        align-items: flex-end;
+    }
+
+    .message-bubble {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 12px 16px;
+        line-height: 1.5;
+    }
+
+    .user-message .message-bubble {
+        background: linear-gradient(135deg, rgba(255, 42, 42, 0.15), rgba(255, 86, 86, 0.1));
+        border-color: rgba(255, 42, 42, 0.3);
+    }
+
+    .message-bubble p {
+        margin: 0 0 8px 0;
+    }
+
+    .message-bubble p:last-child {
+        margin-bottom: 0;
+    }
+
+    .message-bubble ul {
+        margin: 8px 0;
+        padding-left: 20px;
+    }
+
+    .message-bubble li {
+        margin: 4px 0;
+    }
+
+    .message-bubble h3 {
+        margin: 12px 0 8px 0;
+        font-size: 1.1rem;
+    }
+
+    .message-bubble strong {
+        color: var(--accent);
+    }
+
+    .message-bubble hr {
+        margin: 12px 0;
+        border: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .disclaimer-text {
+        font-size: 0.85rem;
+        color: #ffb4b4;
+        background: rgba(255, 42, 42, 0.1);
+        padding: 8px 12px;
+        border-radius: 8px;
+        border-left: 3px solid var(--accent);
+        margin-top: 8px;
+    }
+
+    .message-time {
+        font-size: 0.75rem;
+        color: var(--muted);
+        padding: 0 4px;
+    }
+
+    .chat-input-container {
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 16px 24px;
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .typing-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 0.9rem;
+    }
+
+    .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--accent);
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+    }
+
+    .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+
+        0%,
+        60%,
+        100% {
+            transform: translateY(0);
+            opacity: 0.7;
+        }
+
+        30% {
+            transform: translateY(-10px);
+            opacity: 1;
+        }
+    }
+
+    .chat-input-form {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+    }
+
+    .chat-input {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 12px 16px;
+        color: var(--text);
+        font-family: inherit;
+        font-size: 0.95rem;
+        resize: none;
+        max-height: 120px;
+        transition: border-color 0.2s;
+    }
+
+    .chat-input:focus {
+        outline: none;
+        border-color: var(--accent);
+    }
+
+    .send-btn {
+        background: linear-gradient(135deg, var(--accent), #ff5656);
+        border: none;
+        border-radius: 12px;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(255, 42, 42, 0.3);
+        color: #ffffff;
+    }
+
+    .send-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(255, 42, 42, 0.4);
+    }
+
+    .send-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .quick-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+    }
+
+    .quick-btn {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .quick-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+        border-color: var(--accent);
+        transform: translateY(-1px);
+    }
+
+    /* Scrollbar styling */
+    .chat-messages::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 4px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    @media (max-width: 768px) {
+        .chat-container {
+            height: calc(100vh - 150px);
+            border-radius: 16px;
+        }
+
+        .message-content {
+            max-width: 85%;
+        }
+
+        .quick-actions {
+            flex-direction: column;
+        }
+
+        .quick-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    let conversationHistory = [];
+
+    function sendMessage(event) {
+        event.preventDefault();
+
+        const input = document.getElementById('messageInput');
+        const message = input.value.trim();
+
+        if (!message) return;
+
+        // Add user message to chat
+        addMessage(message, 'user');
+
+        // Clear input
+        input.value = '';
+        input.style.height = 'auto';
+
+        // Show typing indicator
+        showTyping();
+
+        // Send to API
+        fetch('/chat/api', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message })
+        })
+            .then(response => response.json())
+            .then(data => {
+                hideTyping();
+
+                if (data.success) {
+                    // Convert markdown-like formatting to HTML
+                    let formattedResponse = formatResponse(data.response);
+                    addMessage(formattedResponse, 'bot');
+
+                    // Store in history
+                    conversationHistory.push({
+                        user: message,
+                        bot: data.response,
+                        symptoms: data.detected_symptoms,
+                        results: data.results
+                    });
+                } else {
+                    addMessage('Maaf, terjadi kesalahan: ' + (data.error || 'Unknown error'), 'bot');
+                }
+            })
+            .catch(error => {
+                hideTyping();
+                addMessage('Maaf, terjadi kesalahan koneksi. Silakan coba lagi.', 'bot');
+                console.error('Error:', error);
+            });
+    }
+
+    function formatResponse(text) {
+        // Convert markdown-like syntax to HTML
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        text = text.replace(/### (.*?)$/gm, '<h3>$1</h3>');
+        text = text.replace(/^- (.*?)$/gm, '<li>$1</li>');
+        text = text.replace(/---/g, '<hr>');
+
+        // Wrap lists
+        text = text.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+
+        // Convert newlines to paragraphs
+        const paragraphs = text.split('\n\n').filter(p => p.trim());
+        text = paragraphs.map(p => {
+            if (p.startsWith('<h3>') || p.startsWith('<ul>') || p.startsWith('<hr>')) {
+                return p;
+            }
+            return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+        }).join('');
+
+        return text;
+    }
+
+    function addMessage(content, type) {
+        const messagesContainer = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}-message`;
+
+        const avatar = type === 'bot' ? '🤖' : '👤';
+        const time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+        messageDiv.innerHTML = `
+    <div class="message-avatar">${avatar}</div>
+    <div class="message-content">
+      <div class="message-bubble">
+        ${content}
+      </div>
+      <span class="message-time">${time}</span>
+    </div>
+  `;
+
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function showTyping() {
+        document.getElementById('typingIndicator').style.display = 'flex';
+        document.getElementById('sendBtn').disabled = true;
+    }
+
+    function hideTyping() {
+        document.getElementById('typingIndicator').style.display = 'none';
+        document.getElementById('sendBtn').disabled = false;
+    }
+
+    function quickMessage(message) {
+        document.getElementById('messageInput').value = message;
+        document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+    }
+
+    function clearChat() {
+        if (confirm('Hapus semua riwayat percakapan?')) {
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = `
+      <div class="message bot-message">
+        <div class="message-avatar">🤖</div>
+        <div class="message-content">
+          <div class="message-bubble">
+            <p>Riwayat percakapan telah dihapus. Silakan mulai percakapan baru!</p>
+          </div>
+          <span class="message-time">Baru saja</span>
+        </div>
+      </div>
+    `;
+            conversationHistory = [];
+        }
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+        }
+    }
+
+    // Auto-resize textarea
+    document.getElementById('messageInput').addEventListener('input', function () {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+</script>
+{% endblock %}

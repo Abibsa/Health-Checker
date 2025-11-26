@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Hasil Pemeriksaan — Health Checker{% endblock %}
+
+{% block content %}
+<style>
+  .match-high {
+    color: #4CAF50;
+  }
+
+  .match-medium {
+    color: #FF9800;
+  }
+
+  .match-low {
+    color: #999;
+  }
+</style>
+<div class="container">
+  <header>
+    <p class="badge emergency">Hasil Analisis</p>
+    <h1>Ringkasan Pemeriksaan</h1>
+    <p class="lead">Berikut kemungkinan kondisi dan prioritas tindak lanjut berdasarkan gejala serta metrik tubuh yang
+      Anda masukkan.</p>
+  </header>
+
+  <div class="card">
+    <p><strong>Gejala yang Anda laporkan:</strong></p>
+    {% if selected %}
+    <div class="symptom-grid">
+      {% for s in selected %}
+      {% for key, label in symptoms %}
+      {% if key == s %}
+      <span class="badge">{{ label }}</span>
+      {% endif %}
+      {% endfor %}
+      {% endfor %}
+    </div>
+    <p class="meta">Total gejala yang dilaporkan: <strong>{{ selected|length }}</strong></p>
+    {% else %}
+    <p class="meta">Tidak ada gejala yang dipilih.</p>
+    {% endif %}
+  </div>
+
+  {% if metrics_error %}
+  <div class="card">
+    <p class="error">{{ metrics_error }}</p>
+  </div>
+  {% endif %}
+
+  {% if metrics %}
+  <div class="card">
+    <p class="badge">Metrik Tubuh</p>
+    <h2>BMI: {{ metrics.bmi }}</h2>
+    <p>Kategori WHO: <strong>{{ metrics.bmi_category }}</strong></p>
+    <div class="meta">
+      Berat {{ metrics.weight }} {{ 'kg' if metrics.units == 'metric' else 'lbs' }},
+      tinggi {{ metrics.height }} {{ 'cm' if metrics.units == 'metric' else 'in' }}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if results %}
+  <div class="card">
+    <p class="badge">Hasil Diagnosis</p>
+    <h2>Analisis Kondisi Kesehatan</h2>
+    <p class="meta">Sistem telah menganalisis gejala Anda dan menemukan <strong>{{ results|length }}</strong>
+      kemungkinan kondisi yang relevan, diurutkan berdasarkan tingkat prioritas dan kesesuaian gejala.</p>
+
+    {% if results[0].priority == 0 %}
+    <div
+      style="margin-top: 1.5rem; padding: 1rem; background: rgba(255, 42, 42, 0.15); border-left: 4px solid var(--accent); border-radius: 8px;">
+      <strong style="color: var(--accent);">⚠️ PERHATIAN:</strong> Hasil menunjukkan kondisi yang memerlukan
+      <strong>perhatian medis segera</strong>. Silakan ikuti saran yang diberikan dengan serius.
+    </div>
+    {% endif %}
+  </div>
+
+  {% for r in results %}
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+      <p
+        class="badge {% if r.priority == 0 %}emergency{% elif r.match_percentage >= 80 %}badge{% else %}meta{% endif %}">
+        {% if r.match_percentage == 100 %}Diagnosis Pasti{% elif r.match_percentage >= 80 %}Kemungkinan Tinggi{% elif
+        r.match_percentage >= 60 %}Kemungkinan Sedang{% else %}Kemungkinan Rendah{% endif %}
+      </p>
+      <div style="text-align: right;">
+        <div style="font-size: 0.9rem; color: var(--text-muted);">Prioritas</div>
+        <div style="font-weight: bold; font-size: 1.1rem;">
+          {% if r.priority == 0 %}🚨 DARURAT{% elif r.priority == 1 %}⚠️ TINGGI{% elif r.priority == 2 %}📋 SEDANG{%
+          elif r.priority == 3 %}ℹ️ RENDAH{% else %}SANGAT RENDAH{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <h2>{{ r.conclusion }}</h2>
+    <p style="margin: 1rem 0; line-height: 1.7;">
+      {% if r.advice %}
+      {{ r.advice }}
+      {% else %}
+      Konsultasikan dengan tenaga medis untuk evaluasi lebih lanjut.
+      {% endif %}
+    </p>
+
+    <div
+      style="background: var(--bg-secondary, rgba(255,255,255,0.05)); padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+      <h3 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--text-primary);">Analisis Gejala:</h3>
+
+      <div style="margin-bottom: 1rem;">
+        {% if r.match_percentage >= 80 %}
+        {% set match_class = "match-high" %}
+        {% elif r.match_percentage >= 60 %}
+        {% set match_class = "match-medium" %}
+        {% else %}
+        {% set match_class = "match-low" %}
+        {% endif %}
+        <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">
+          <strong>Tingkat Kesesuaian:</strong>
+          <span class="{{ match_class }}" style="font-weight: bold;">
+            {{ r.match_percentage }}%
+          </span>
+          ({{ r.score }} dari {{ r.total_conditions }} gejala cocok)
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <strong style="color: var(--accent, #4CAF50);">✓ Gejala yang Sesuai:</strong>
+        <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+          {% for cond in r.matched_conditions %}
+          <span
+            style="background: rgba(76, 175, 80, 0.2); color: #4CAF50; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.9rem;">
+            {{ symptom_map[cond] if cond in symptom_map else cond }}
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if r.unmatched_conditions %}
+      <div>
+        <strong style="color: var(--text-muted);">○ Gejala Tambahan yang Mungkin Relevan:</strong>
+        <div style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+          {% for cond in r.unmatched_conditions %}
+          <span
+            style="background: rgba(128, 128, 128, 0.2); color: var(--text-muted); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.9rem;">
+            {{ symptom_map[cond] if cond in symptom_map else cond }}
+          </span>
+          {% endfor %}
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+          <em>Catatan: Gejala ini tidak Anda laporkan, tetapi sering muncul pada kondisi ini.</em>
+        </p>
+      </div>
+      {% endif %}
+
+      {% if r.bmi_requirement %}
+      <div
+        style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color, rgba(255,255,255,0.1));">
+        <div style="font-size: 0.9rem;">
+          <strong>Faktor BMI:</strong>
+          {% if r.bmi_match %}
+          <span style="color: var(--accent, #4CAF50);">✓ BMI Anda ({{ metrics.bmi_category if metrics else 'N/A' }})
+            sesuai dengan kondisi ini</span>
+          {% else %}
+          <span style="color: var(--warning, #FF9800);">⚠️ Kondisi ini biasanya terkait dengan BMI {{ r.bmi_requirement
+            }}</span>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <div class="card">
+    <p class="error">Tidak ditemukan kondisi yang relevan dengan gejala yang dilaporkan.</p>
+    <p style="margin-top: 1rem;">Sistem telah menganalisis semua kondisi yang tersedia, namun tidak menemukan kecocokan
+      yang signifikan.</p>
+    <p style="margin-top: 0.5rem;"><strong>Rekomendasi:</strong> Tetap waspada dan konsultasi dengan dokter jika gejala
+      berlanjut atau memburuk. Gejala yang Anda alami mungkin memerlukan evaluasi medis langsung.</p>
+  </div>
+  {% endif %}
+
+  <a class="nav-link" href="/diagnosa">← Kembali ke form pemeriksaan</a>
+</div>
+{% endblock %}

@@ -1,0 +1,615 @@
+{% extends "base.html" %}
+
+{% block title %}Diagnosa — Health Checker{% endblock %}
+
+{% block content %}
+<div class="container">
+  <header>
+    <p class="badge emergency">Sistem Diagnosa</p>
+    <h1>Pemeriksaan Gejala</h1>
+    <p class="lead">Pilih gejala yang Anda alami. Sistem akan menganalisis dan memberikan rekomendasi berdasarkan rules
+      yang tersedia.</p>
+  </header>
+
+  <form action="/check" method="post" class="card form-section">
+    <fieldset>
+      <legend>Gejala</legend>
+      <p class="meta">Tandai semua gejala yang Anda rasakan. Sistem akan mencari rules dengan prioritas tertinggi.</p>
+
+      <!-- Search Bar -->
+      <div class="symptom-search-wrapper">
+        <input type="text" id="symptomSearch" class="symptom-search" placeholder="🔍 Cari gejala (batuk, demam...)"
+          autocomplete="off">
+        <div class="search-stats">
+          <span><span id="selectedCount">0</span> gejala dipilih</span>
+          <button type="button" class="btn-clear-all" id="clearAll" style="display: none;">Hapus Semua</button>
+        </div>
+      </div>
+
+      <!-- Category Tabs -->
+      <div class="category-tabs">
+        <button type="button" class="category-tab active" data-category="all">
+          Semua <span class="category-count">({{ symptoms|length }})</span>
+        </button>
+        {% for category, items in symptom_categories.items() %}
+        <button type="button" class="category-tab" data-category="{{ category }}">
+          {{ category }} <span class="category-count">({{ items|length }})</span>
+        </button>
+        {% endfor %}
+      </div>
+
+      <!-- Categorized Symptoms -->
+      <div class="symptoms-container">
+        {% for category, items in symptom_categories.items() %}
+        <details class="symptom-category" data-category="{{ category }}" open>
+          <summary>
+            <span class="category-icon">
+              {% if category == "Pernapasan" %}🫁
+              {% elif category == "Neurologis" %}🧠
+              {% elif category == "Pencernaan" %}🍽️
+              {% elif category == "Indra" %}👁️
+              {% elif category == "Kulit & Alergi" %}🩹
+              {% elif category == "Sistemik" %}💪
+              {% endif %}
+            </span>
+            <span class="category-title">{{ category }}</span>
+            <span class="category-badge">{{ items|length }} gejala</span>
+          </summary>
+          <div class="symptom-grid">
+            {% for key, label in items %}
+            <label class="checkbox symptom-item" for="{{ key }}" data-symptom-name="{{ label|lower }}">
+              <input type="checkbox" id="{{ key }}" name="symptom" value="{{ key }}">
+              <span>{{ label }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </details>
+        {% endfor %}
+      </div>
+
+      <!-- No Results Message -->
+      <div id="noResults" class="no-results" style="display: none;">
+        <p>😕 Tidak ada gejala yang cocok dengan pencarian Anda.</p>
+        <p class="meta">Coba kata kunci lain atau pilih dari kategori di atas.</p>
+      </div>
+    </fieldset>
+
+    <div class="card card-nested">
+      <legend>Body Metrics (Opsional)</legend>
+      <p class="meta">BMI membantu rules mengenali risiko metabolik. Isi jika Anda mengetahui berat & tinggi badan.</p>
+      <div class="form-grid">
+        <label class="input-field">
+          <span>Berat</span>
+          <input type="number" step="0.1" name="weight" placeholder="contoh: 70">
+        </label>
+        <label class="input-field">
+          <span>Tinggi</span>
+          <input type="number" step="0.1" name="height" placeholder="contoh: 175">
+        </label>
+      </div>
+      <div class="unit-toggle">
+        <label>
+          <input type="radio" name="units" value="metric" checked>
+          Metric (kg / cm)
+        </label>
+        <label>
+          <input type="radio" name="units" value="imperial">
+          Imperial (lbs / inches)
+        </label>
+      </div>
+    </div>
+
+    <button type="submit">Periksa Sekarang</button>
+  </form>
+
+  <div class="card">
+    <p class="badge">Cara Kerja</p>
+    <h2>Bagaimana Proses Diagnosa?</h2>
+    <ol class="step-list">
+      <li><strong>Kumpulkan data</strong> — Gejala & BMI dipadukan menjadi fakta dalam basis pengetahuan.</li>
+      <li><strong>Evaluasi rules</strong> — Mesin mengecek kondisi & prioritas, lalu menyusun rekomendasi bertingkat.
+      </li>
+      <li><strong>Ambil tindakan</strong> — Gunakan saran untuk menentukan apakah perlu darurat, konsultasi, atau
+        self-care.</li>
+    </ol>
+  </div>
+
+  <a class="nav-link" href="/">← Kembali ke Beranda</a>
+</div>
+
+<script>
+  // Enhanced Symptom Search and Filter Functionality
+  (function () {
+    const searchInput = document.getElementById('symptomSearch');
+    const selectedCount = document.getElementById('selectedCount');
+    const clearAllBtn = document.getElementById('clearAll');
+    const noResults = document.getElementById('noResults');
+    const categoryTabs = document.querySelectorAll('.category-tab');
+    const symptomCategories = document.querySelectorAll('.symptom-category');
+    const symptomItems = document.querySelectorAll('.symptom-item');
+    const checkboxes = document.querySelectorAll('input[name="symptom"]');
+
+    let activeCategory = 'all';
+
+    // Update selected count with animation
+    function updateSelectedCount() {
+      const count = document.querySelectorAll('input[name="symptom"]:checked').length;
+
+      // Animate count change
+      if (selectedCount.textContent !== count.toString()) {
+        selectedCount.style.transform = 'scale(1.2)';
+        setTimeout(() => {
+          selectedCount.textContent = count;
+          selectedCount.style.transform = 'scale(1)';
+        }, 100);
+      }
+
+      clearAllBtn.style.display = count > 0 ? 'inline-block' : 'none';
+    }
+
+    // Clear all selections
+    clearAllBtn.addEventListener('click', function () {
+      checkboxes.forEach(cb => cb.checked = false);
+      updateSelectedCount();
+    });
+
+    // Highlight matching text
+    function highlightText(text, searchTerm) {
+      if (!searchTerm) return text;
+      const regex = new RegExp(`(${searchTerm})`, 'gi');
+      return text.replace(regex, '<mark class="search-highlight">$1</mark>');
+    }
+
+    // Enhanced search functionality with highlighting
+    function performSearch() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      let hasVisibleItems = false;
+      let visibleCount = 0;
+
+      symptomCategories.forEach(category => {
+        const items = category.querySelectorAll('.symptom-item');
+        let categoryHasVisible = false;
+
+        items.forEach(item => {
+          const symptomName = item.dataset.symptomName;
+          const span = item.querySelector('span');
+          const matches = symptomName.includes(searchTerm);
+
+          if (searchTerm === '' || matches) {
+            item.style.display = '';
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+
+            categoryHasVisible = true;
+            hasVisibleItems = true;
+            visibleCount++;
+
+            // Highlight matching text
+            if (searchTerm && span) {
+              const originalText = span.textContent;
+              span.innerHTML = highlightText(originalText, searchTerm);
+            }
+          } else {
+            item.style.opacity = '0';
+            setTimeout(() => {
+              item.style.display = 'none';
+            }, 200);
+
+            // Remove highlight
+            if (span && span.innerHTML.includes('<mark')) {
+              span.innerHTML = span.textContent;
+            }
+          }
+        });
+
+        // Show/hide category based on visible items
+        if (categoryHasVisible && (activeCategory === 'all' || category.dataset.category === activeCategory)) {
+          category.style.display = '';
+          if (searchTerm !== '') {
+            category.setAttribute('open', '');
+          }
+        } else {
+          category.style.display = 'none';
+        }
+      });
+
+      // Show no results message
+      noResults.style.display = hasVisibleItems ? 'none' : 'block';
+    }
+
+    // Search with debouncing
+    let searchTimeout;
+    searchInput.addEventListener('input', function () {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(performSearch, 150);
+    });
+
+    // Category tab functionality
+    categoryTabs.forEach(tab => {
+      tab.addEventListener('click', function () {
+        categoryTabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        activeCategory = this.dataset.category;
+
+        symptomCategories.forEach(category => {
+          if (activeCategory === 'all' || category.dataset.category === activeCategory) {
+            category.style.display = '';
+          } else {
+            category.style.display = 'none';
+          }
+        });
+
+        performSearch();
+      });
+    });
+
+    // Listen to checkbox changes
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', updateSelectedCount);
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function (e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+
+      if (e.key === 'Escape' && document.activeElement === searchInput) {
+        searchInput.value = '';
+        performSearch();
+      }
+    });
+
+    // Initialize
+    updateSelectedCount();
+    symptomItems.forEach(item => {
+      item.style.transition = 'all 0.3s ease';
+    });
+  })();
+</script>
+
+<style>
+  /* Modern Color Scheme with Vibrant Gradients */
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --accent-color: #667eea;
+    --accent-light: #8b9cff;
+    --accent-dark: #5568d3;
+    --text-primary: #f5f5f5;
+    --text-secondary: #b8c1ec;
+    --bg-card: rgba(255, 255, 255, 0.05);
+    --bg-hover: rgba(255, 255, 255, 0.08);
+    --border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Search Highlight */
+  .search-highlight {
+    background: var(--secondary-gradient);
+    color: white;
+    padding: 0.125rem 0.25rem;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+
+  /* Search Bar Styles */
+  .symptom-search-wrapper {
+    margin-bottom: 1.5rem;
+  }
+
+  .symptom-search {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    font-size: 1rem;
+    border: 2px solid rgba(102, 126, 234, 0.3);
+    border-radius: 16px;
+    background: rgba(102, 126, 234, 0.05);
+    transition: all 0.3s ease;
+    font-family: inherit;
+    color: var(--text-primary);
+    backdrop-filter: blur(10px);
+  }
+
+  .symptom-search::placeholder {
+    color: var(--text-secondary);
+  }
+
+  .symptom-search:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15),
+      0 8px 24px rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .search-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .search-stats span {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 600;
+    transition: transform 0.2s ease;
+  }
+
+  .btn-clear-all {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+    background: var(--secondary-gradient);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
+  }
+
+  .btn-clear-all:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 87, 108, 0.4);
+  }
+
+  .btn-clear-all:active {
+    transform: translateY(0);
+  }
+
+  /* Category Tabs */
+  .category-tabs {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+    background: var(--bg-card);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 5;
+  }
+
+  .category-tab {
+    padding: 0.75rem 1.25rem;
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    position: relative;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+    z-index: 6;
+  }
+
+  .category-tab:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--accent-light);
+    border-color: rgba(102, 126, 234, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .category-tab.active {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .category-count {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    margin-left: 0.25rem;
+    font-weight: 500;
+  }
+
+  /* Symptom Categories */
+  .symptoms-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .symptom-category {
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    padding: 0;
+    background: var(--bg-card);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+  }
+
+  .symptom-category:hover {
+    border-color: rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .symptom-category summary {
+    padding: 1.25rem 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    user-select: none;
+    list-style: none;
+    transition: all 0.3s ease;
+    background: rgba(102, 126, 234, 0.05);
+  }
+
+  .symptom-category summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .symptom-category summary:hover {
+    background: rgba(102, 126, 234, 0.1);
+  }
+
+  .symptom-category[open] summary {
+    border-bottom: 2px solid var(--border-color);
+    background: var(--primary-gradient);
+    color: white;
+  }
+
+  .symptom-category[open] summary .category-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  .category-icon {
+    font-size: 1.75rem;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  }
+
+  .category-title {
+    flex: 1;
+    font-size: 1.125rem;
+    letter-spacing: 0.02em;
+  }
+
+  .category-badge {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+    background: rgba(102, 126, 234, 0.15);
+    color: var(--accent-light);
+    border-radius: 20px;
+    font-weight: 600;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+  }
+
+  .symptom-category .symptom-grid {
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  /* Enhanced Checkbox Styling */
+  .symptom-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .symptom-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--primary-gradient);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+  }
+
+  .symptom-item:hover::before {
+    opacity: 0.1;
+  }
+
+  .symptom-item:hover {
+    transform: translateY(-3px);
+    border-color: rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+  }
+
+  .symptom-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--accent-color);
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+  }
+
+  .symptom-item span {
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  /* Checked State - Vibrant! */
+  .symptom-item:has(input:checked) {
+    background: var(--primary-gradient);
+    border-color: transparent;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4),
+      0 0 40px rgba(102, 126, 234, 0.2);
+    transform: translateY(-3px) scale(1.02);
+  }
+
+  .symptom-item:has(input:checked)::before {
+    opacity: 0;
+  }
+
+  .symptom-item:has(input:checked) span {
+    color: white;
+    font-weight: 600;
+  }
+
+  /* No Results */
+  .no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    border-radius: 16px;
+    border: 2px dashed var(--border-color);
+    transition: opacity 0.3s ease;
+  }
+
+  .no-results p:first-child {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    filter: grayscale(0.3);
+  }
+
+
+  .category-tabs::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+
+  .category-tabs::-webkit-scrollbar-thumb {
+    background: var(--primary-gradient);
+    border-radius: 10px;
+  }
+
+  .category-tabs::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-dark);
+  }
+</style>
+{% endblock %}
