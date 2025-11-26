@@ -19,6 +19,8 @@ Sistem pakar berbasis aturan untuk diagnosis kesehatan dengan integrasi AI chatb
 - [Development](#-development)
 - [Troubleshooting](#-troubleshooting)
 - [Tech Stack](#-tech-stack)
+- [Deployment ke Render](#-deployment-ke-render)
+
 
 ---
 
@@ -613,6 +615,166 @@ Jika ada masalah:
 
 ---
 
+## 🚀 Deployment ke Render
+
+Aplikasi ini sudah siap untuk di-deploy ke **Render** (platform hosting gratis).
+
+### 📋 Prerequisites
+
+- ✅ Repository GitHub: https://github.com/Abibsa/Health-Checker
+- ✅ Akun Render (gratis): https://render.com
+- ✅ File yang sudah disiapkan:
+  - `Procfile` - Konfigurasi web server
+  - `requirements.txt` - Dependencies dengan gunicorn
+  - `app.py` - Sudah support dynamic PORT
+
+### 🎯 Langkah Deployment
+
+#### 1. Buat Akun Render
+
+1. Kunjungi: **https://render.com**
+2. Klik **"Get Started for Free"**
+3. Sign up dengan **GitHub account**
+4. Authorize Render untuk mengakses GitHub
+
+#### 2. Buat Web Service
+
+1. Di Render dashboard, klik **"New +"** → **"Web Service"**
+2. Klik **"Connect a repository"**
+3. Pilih repository: **Abibsa/Health-Checker**
+4. Jika tidak muncul, klik "Configure account" dan berikan akses
+
+#### 3. Konfigurasi Service
+
+Isi form dengan konfigurasi berikut:
+
+**Basic Settings:**
+- **Name**: `health-checker` (atau nama pilihan Anda)
+- **Region**: `Singapore` (terdekat dengan Indonesia)
+- **Branch**: `main`
+- **Runtime**: `Python 3`
+
+**Build & Deploy:**
+- **Build Command**: 
+  ```bash
+  pip install -r requirements.txt
+  ```
+- **Start Command**: 
+  ```bash
+  gunicorn app:app
+  ```
+
+**Instance Type:**
+- **Plan**: Pilih **"Free"**
+  - 750 jam/bulan gratis
+  - 512 MB RAM
+  - Auto-sleep setelah 15 menit tidak aktif
+
+#### 4. Set Environment Variables
+
+Di bagian **"Environment Variables"**, tambahkan:
+
+| Key | Value | Keterangan |
+|-----|-------|------------|
+| `GEMINI_API_KEY` | `<your-api-key>` | Opsional - untuk AI chatbot |
+| `FLASK_ENV` | `production` | Production mode |
+
+**Cara mendapatkan GEMINI_API_KEY:**
+1. Kunjungi: https://aistudio.google.com/app/apikey
+2. Login dengan akun Google
+3. Klik "Create API Key"
+4. Copy dan paste di Render
+
+> **Note**: Tanpa API key, aplikasi tetap berfungsi dengan rule-based fallback.
+
+#### 5. Deploy!
+
+1. Klik **"Create Web Service"**
+2. Tunggu proses build (5-10 menit)
+3. Status akan berubah menjadi **"Live"** ✅
+
+#### 6. Akses Aplikasi
+
+Aplikasi akan tersedia di:
+```
+https://health-checker.onrender.com
+```
+(atau sesuai nama yang Anda pilih)
+
+### 🔄 Auto-Deploy
+
+Setiap kali Anda push ke GitHub, Render akan otomatis deploy:
+
+```bash
+git add .
+git commit -m "Update fitur baru"
+git push
+```
+
+### 🆘 Troubleshooting Deployment
+
+#### Build Failed
+**Error**: `No module named 'xxx'`
+
+**Solusi**: Pastikan semua dependencies ada di `requirements.txt`
+
+#### Application Error
+**Error**: `Application failed to respond`
+
+**Solusi**:
+- Cek logs di Render dashboard
+- Pastikan `Procfile` berisi: `web: gunicorn app:app`
+- Pastikan PORT environment variable digunakan
+
+#### App Lambat (Cold Start)
+**Gejala**: App lambat saat pertama kali diakses
+
+**Penjelasan**: Free tier sleep setelah 15 menit tidak aktif
+
+**Solusi**:
+- Normal untuk free tier (cold start 30-60 detik)
+- Upgrade ke paid plan ($7/bulan) untuk always-on
+- Atau gunakan UptimeRobot untuk keep alive
+
+### 💰 Pricing
+
+| Plan | Harga | RAM | Status | Cold Start |
+|------|-------|-----|--------|------------|
+| **Free** | $0 | 512 MB | Sleep setelah 15 min | Ya (30-60s) |
+| **Starter** | $7/bulan | 512 MB | Always-on | Tidak |
+| **Standard** | $25/bulan | 2 GB | Always-on | Tidak |
+
+### 🎨 Custom Domain (Opsional)
+
+1. Beli domain (Namecheap, GoDaddy, dll)
+2. Di Render: Settings → Custom Domain → Add
+3. Tambahkan DNS records di domain provider:
+   - **Type**: CNAME
+   - **Name**: @ atau www
+   - **Value**: `<your-app>.onrender.com`
+4. SSL certificate otomatis di-setup oleh Render
+
+### 📊 Monitoring
+
+Di Render dashboard, Anda bisa monitor:
+- **Logs** - Real-time application logs
+- **Metrics** - CPU, Memory, Request count
+- **Events** - Deployment history
+
+### ✅ Checklist Deployment
+
+- [x] Repository di GitHub
+- [x] File Procfile sudah ada
+- [x] requirements.txt dengan gunicorn
+- [x] app.py support dynamic PORT
+- [ ] Buat akun Render
+- [ ] Connect GitHub repository
+- [ ] Konfigurasi web service
+- [ ] Set environment variables
+- [ ] Deploy & test
+
+---
+
 ## 🚀 Recent Updates (v2.1.0)
 
 - ✅ Comprehensive responsive design untuk semua perangkat
@@ -622,6 +784,7 @@ Jika ada masalah:
 - ✅ Better form layouts untuk mobile
 - ✅ Landscape orientation support
 - ✅ Print styles untuk mencetak halaman
+- ✅ **Ready for deployment** - Procfile dan production config
 
 Lihat [CHANGELOG.md](CHANGELOG.md) untuk detail lengkap.
 
