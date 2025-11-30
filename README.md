@@ -102,9 +102,13 @@ Sistem pakar berbasis aturan untuk diagnosis kesehatan dengan integrasi AI chatb
 
 ## 🚀 Quick Start
 
-### 1. Install Dependencies
+### 1. Setup Project
+
+Clone repository dan install dependencies:
 
 ```bash
+git clone https://github.com/Abibsa/Health-Checker.git
+cd Health-Checker
 pip install -r requirements.txt
 ```
 
@@ -221,7 +225,7 @@ scripts\setup_api_key.bat
 
 ```powershell
 # Buat file .env di root folder
-GEMINI_API_KEY=paste_api_key_anda_disini
+GEMINI_API_KEY=AIzaSyB1yplt-hF3ucUZd5vN3xhupY40VF9udhs
 ```
 
 ### 3️⃣ Restart Aplikasi

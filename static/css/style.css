@@ -476,9 +476,19 @@ tbody tr:hover {
     color: var(--text);
 }
 
+.input-field select option {
+    background-color: var(--card);
+    color: var(--text);
+}
+
 .input-field input:focus {
     outline: none;
     border-color: var(--accent);
+}
+
+.input-field input::placeholder {
+    color: var(--muted);
+    opacity: 0.8;
 }
 
 .unit-toggle {
