@@ -23,7 +23,9 @@ app.secret_key = os.urandom(24)  # For session management
 
 # Initialize AI Chat (akan error jika tidak ada API key, tapi kita handle di route)
 try:
-    ai_chat = HealthChatAI()
+    # Untuk development lokal, bisa langsung pakai API key
+    # Untuk production/GitHub, hapus parameter api_key ini dan pakai .env
+    ai_chat = HealthChatAI(api_key="AIzaSyBRjRmOJJIpUNhU4tb8ezWzDk2KOk3P0s4")
     AI_ENABLED = True
 except Exception as e:
     print(f"Warning: AI Chat tidak tersedia: {e}")
